@@ -7,7 +7,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -26,11 +30,31 @@ class MainActivity : AppCompatActivity() {
         //producer()
         //consumer()
         GlobalScope.launch {
-            val data:Flow<Int> =producer()
-            data.collect{
-                Log.d("jashwant",it.toString())
+            producer()
+                .onStart {
+                    emit(-1)
+                    Log.d("jashwant","flow on start")
+                }
+                .onCompletion {
+                    emit(100)
+                    Log.d("jashwant","flow on completed")
+                }
+                .onEach {
+                    Log.d("jashwant","About to emit-$it")
+                }
+                .collect{
+                Log.d("jashwant ","first -  "+it.toString()
+                )
             }
         }
+        /*GlobalScope.launch {
+            val data:Flow<Int> =producer()
+            delay(2500)
+            data.collect{
+                Log.d("jashwant  second -",it.toString())
+            }
+        }*/
+
 
 
     }
