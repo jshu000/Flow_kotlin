@@ -11,7 +11,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -35,22 +38,31 @@ class MainActivity : AppCompatActivity() {
         //producer()
         //consumer()
         GlobalScope.launch(Dispatchers.Main) {
-            producer()
-                .collect {
-                    Log.d("jashwant", "Collector Thread - ${Thread.currentThread().name}")
-                }
+            producer()                                     //IO
+                .map {                                     //IO
+                    delay(1000)                   //IO
+                    it*2                                  //IO
+                    Log.d("jashwant", "Map Thread - ${Thread.currentThread().name}") //IO
+                }                                         //IO
+                .filter {                                 //IO
+                    delay(500)                   //IO
+                    Log.d("jashwant", "Filter Thread - ${Thread.currentThread().name}")  //IO
+                    it<8                                 //IO
+                }                                        //IO
+                .flowOn(Dispatchers.IO)                  //IO
+                .collect {                               //Main
+                    Log.d("jashwant", "Collector Thread - ${Thread.currentThread().name}")  //Main
+                }                                        //Main
         }
 
     }
     private fun producer(): Flow<Int> {
         return flow <Int> {
-            withContext(Dispatchers.IO) {
-                val list = listOf(1, 2, 3, 4, 5)
-                list.forEach {
-                    delay(timeMillis = 1000)
-                    Log.d("jashwant", "Emitter Thread - ${Thread.currentThread().name}")
-                    emit(it)
-                }
+            val list = listOf(1, 2, 3, 4, 5)
+            list.forEach {
+                delay(timeMillis = 1000)
+                Log.d("jashwant", "Emitter Thread - ${Thread.currentThread().name}")
+                emit(it)
             }
         }
     }
