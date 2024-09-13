@@ -9,9 +9,12 @@ import androidx.core.view.WindowInsetsCompat
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -30,22 +33,16 @@ class MainActivity : AppCompatActivity() {
         //producer()
         //consumer()
         GlobalScope.launch {
-            producer()
-                .onStart {
-                    emit(-1)
-                    Log.d("jashwant","flow on start")
+            val result=producer()
+                .map {
+                    it*2
                 }
-                .onCompletion {
-                    emit(100)
-                    Log.d("jashwant","flow on completed")
-                }
-                .onEach {
-                    Log.d("jashwant","About to emit-$it")
+                .filter {
+                    it <8
                 }
                 .collect{
-                Log.d("jashwant ","first -  "+it.toString()
-                )
-            }
+                    Log.d("jashwant","after mapping and filtering "+it.toString())
+                }
         }
         /*GlobalScope.launch {
             val data:Flow<Int> =producer()
