@@ -46,23 +46,10 @@ class MainActivity : AppCompatActivity() {
             }
             Log.d("jashwant","Completion Time in milli-  "+time)
         }
-        /*GlobalScope.launch {
-            val data:Flow<Int> =producer()
-            delay(2500)
-            data.collect{
-                Log.d("jashwant  second -",it.toString())
-            }
-        }*/
 
 
 
     }
-    /*fun producer(){
-        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
-            channel.send(1);
-            channel.send(2);
-        }
-    }*/
     fun producer() = kotlinx.coroutines.flow.flow<Int> {
         android.util.Log.d("jashwant", "producer is producing: ")
         val list= kotlin.collections.listOf(1,2,3,4,5)
@@ -71,13 +58,4 @@ class MainActivity : AppCompatActivity() {
             emit(it)
         }
     }
-
-    /*fun consumer(){
-        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
-            android.util.Log.d("jashwant", "consumer: "+channel.receive().toString())
-            android.util.Log.d("jashwant", "consumer: "+channel.receive().toString())
-            channel.receive();
-            channel.receive();
-        }
-    }*/
 }
