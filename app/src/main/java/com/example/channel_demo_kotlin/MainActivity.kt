@@ -6,10 +6,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -31,31 +33,22 @@ class MainActivity : AppCompatActivity() {
         }
         //producer()
         //consumer()
-        GlobalScope.launch {
-            val time = measureTime {
-                producer()
-                    .buffer(3)
-                .onEach {
-                    Log.d("jashwant","About to emit-$it")
+        GlobalScope.launch(Dispatchers.Main) {
+            producer()
+                .collect {
+                    Log.d("jashwant", "Collector Thread - ${Thread.currentThread().name}")
                 }
-                .collect{
-                    delay(1500)
-                    Log.d("jashwant ","first -  "+it.toString()
-                    )
-                }
-            }
-            Log.d("jashwant","Completion Time in milli-  "+time)
         }
 
-
-
     }
-    fun producer() = kotlinx.coroutines.flow.flow<Int> {
-        android.util.Log.d("jashwant", "producer is producing: ")
-        val list= kotlin.collections.listOf(1,2,3,4,5)
-        list.forEach {
-            kotlinx.coroutines.delay(1000)
-            emit(it)
+    private fun producer(): Flow<Int> {
+        return flow <Int> {
+            val list = listOf(1, 2, 3, 4, 5)
+            list.forEach {
+                delay(timeMillis = 1000)
+                Log.d( "jashwant","Emitter Thread - ${Thread.currentThread().name}")
+                emit(it)
+            }
         }
     }
 }
