@@ -9,6 +9,7 @@ import androidx.core.view.WindowInsetsCompat
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
@@ -33,14 +34,15 @@ class MainActivity : AppCompatActivity() {
         //producer()
         //consumer()
         GlobalScope.launch {
-            val result=producer()
+            getNotes()
                 .map {
-                    it*2
+                    FormattedNote(it.isActive,it.title.uppercase(),it.description)
                 }
                 .filter {
-                    it <8
+                    it.isActive
                 }
                 .collect{
+                    delay(1500)
                     Log.d("jashwant","after mapping and filtering "+it.toString())
                 }
         }
@@ -79,3 +81,16 @@ class MainActivity : AppCompatActivity() {
         }
     }*/
 }
+
+private fun getNotes(): Flow<Note> {
+    val list = listOf(
+        Note(1, true, "First", "First Description"),
+    Note( 2,  true,  "Second", "Second Description"),
+    Note( 3, false,  "Third",  "Third Description")
+    )
+
+    return list.asFlow()
+}
+
+data class Note(val id: Int, val isActive: Boolean, val title: String, val description: String)
+data class FormattedNote(val isActive: Boolean, val title: String, val description: String)
