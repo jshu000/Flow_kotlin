@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.time.measureTime
 
 class MainActivity : AppCompatActivity() {
@@ -43,11 +44,13 @@ class MainActivity : AppCompatActivity() {
     }
     private fun producer(): Flow<Int> {
         return flow <Int> {
-            val list = listOf(1, 2, 3, 4, 5)
-            list.forEach {
-                delay(timeMillis = 1000)
-                Log.d( "jashwant","Emitter Thread - ${Thread.currentThread().name}")
-                emit(it)
+            withContext(Dispatchers.IO) {
+                val list = listOf(1, 2, 3, 4, 5)
+                list.forEach {
+                    delay(timeMillis = 1000)
+                    Log.d("jashwant", "Emitter Thread - ${Thread.currentThread().name}")
+                    emit(it)
+                }
             }
         }
     }
