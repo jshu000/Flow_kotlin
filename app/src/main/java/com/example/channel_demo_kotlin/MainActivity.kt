@@ -11,6 +11,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -38,21 +39,15 @@ class MainActivity : AppCompatActivity() {
         //producer()
         //consumer()
         GlobalScope.launch(Dispatchers.Main) {
-            producer()                                     //IO
-                .map {                                     //IO
-                    delay(1000)                   //IO
-                    it*2                                  //IO
-                    Log.d("jashwant", "Map Thread - ${Thread.currentThread().name}") //IO
-                }                                         //IO
-                .filter {                                 //IO
-                    delay(500)                   //IO
-                    Log.d("jashwant", "Filter Thread - ${Thread.currentThread().name}")  //IO
-                    it<8                                 //IO
-                }                                        //IO
-                .flowOn(Dispatchers.IO)                  //IO
-                .collect {                               //Main
-                    Log.d("jashwant", "Collector Thread - ${Thread.currentThread().name}")  //Main
-                }                                        //Main
+            try {
+                producer()
+                    .collect {
+                        Log.d("jashwant", "Collector Thread - ${Thread.currentThread().name}")
+                    }
+            }
+            catch (e :Exception){
+                Log.d("jashwant", e.message.toString())
+            }
         }
 
     }
@@ -63,7 +58,11 @@ class MainActivity : AppCompatActivity() {
                 delay(timeMillis = 1000)
                 Log.d("jashwant", "Emitter Thread - ${Thread.currentThread().name}")
                 emit(it)
+                throw Exception("Error in Emitter")
             }
+        }.catch {
+            Log.d("jashwant", "Emitter catch - ${it.message}")
+            emit(-1)
         }
     }
 }
