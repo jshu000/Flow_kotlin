@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlin.time.measureTime
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,22 +31,18 @@ class MainActivity : AppCompatActivity() {
         //producer()
         //consumer()
         GlobalScope.launch {
-            producer()
-                .onStart {
-                    emit(-1)
-                    Log.d("jashwant","flow on start")
-                }
-                .onCompletion {
-                    emit(100)
-                    Log.d("jashwant","flow on completed")
-                }
+            val time = measureTime {
+                producer()
                 .onEach {
                     Log.d("jashwant","About to emit-$it")
                 }
                 .collect{
-                Log.d("jashwant ","first -  "+it.toString()
-                )
+                    delay(1500)
+                    Log.d("jashwant ","first -  "+it.toString()
+                    )
+                }
             }
+            Log.d("jashwant","Completion Time in milli-  "+time)
         }
         /*GlobalScope.launch {
             val data:Flow<Int> =producer()
@@ -66,7 +63,7 @@ class MainActivity : AppCompatActivity() {
     }*/
     fun producer() = kotlinx.coroutines.flow.flow<Int> {
         android.util.Log.d("jashwant", "producer is producing: ")
-        val list= kotlin.collections.listOf(1,2,3,4,5,6,7)
+        val list= kotlin.collections.listOf(1,2,3,4,5)
         list.forEach {
             kotlinx.coroutines.delay(1000)
             emit(it)
