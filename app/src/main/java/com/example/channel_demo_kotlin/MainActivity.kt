@@ -9,6 +9,7 @@ import androidx.core.view.WindowInsetsCompat
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -33,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         GlobalScope.launch {
             val time = measureTime {
                 producer()
+                    .buffer(3)
                 .onEach {
                     Log.d("jashwant","About to emit-$it")
                 }
