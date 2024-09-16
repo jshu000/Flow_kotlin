@@ -40,36 +40,25 @@ class MainActivity : AppCompatActivity() {
         }
         //producer()
         //consumer()
-        GlobalScope.launch(Dispatchers.Main) {
-            try {
-                producer()
-                    .collect {
-                        Log.d("jashwant", "1 Item - ${it}")
-                    }
-            }
-            catch (e :Exception){
-                Log.d("jashwant", e.message.toString())
-            }
-        }
+
         GlobalScope.launch(Dispatchers.Main) {
             val result= producer()
-            delay(2500)
+            delay(6000)
             result.collect{
-                Log.d("jashwant", "2 Item - ${it}")
+                Log.d("jashwant", " Item - ${it}")
             }
         }
 
     }
     private fun producer(): Flow<Int> {
-        val mutableSharedFlow = MutableSharedFlow<Int>(1)
+        val mutableStateFlow = MutableStateFlow(10)
         GlobalScope.launch {
-            val list = listOf<Int>(1, 2, 3, 4, 5)
-            list.forEach {
-                mutableSharedFlow.emit(it)
-                delay(timeMillis = 1000)
-            }
+            delay(2000)
+            mutableStateFlow.emit(20)
+            delay(2000)
+            mutableStateFlow.emit(30)
         }
-        return mutableSharedFlow
+        return mutableStateFlow
     }
 
 }
