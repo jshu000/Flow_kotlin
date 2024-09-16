@@ -12,6 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
@@ -43,14 +44,11 @@ class MainActivity : AppCompatActivity() {
 
         GlobalScope.launch(Dispatchers.Main) {
             val result= producer()
-            delay(6000)
-            result.collect{
-                Log.d("jashwant", " Item - ${it}")
-            }
+            Log.d("jashwant", result.value.toString())
         }
 
     }
-    private fun producer(): Flow<Int> {
+    private fun producer(): StateFlow<Int> {
         val mutableStateFlow = MutableStateFlow(10)
         GlobalScope.launch {
             delay(2000)
