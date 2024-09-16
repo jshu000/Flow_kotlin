@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
 
     }
     private fun producer(): Flow<Int> {
-        val mutableSharedFlow = MutableSharedFlow<Int>()
+        val mutableSharedFlow = MutableSharedFlow<Int>(1)
         GlobalScope.launch {
             val list = listOf<Int>(1, 2, 3, 4, 5)
             list.forEach {
