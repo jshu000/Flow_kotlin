@@ -10,6 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
@@ -42,27 +44,32 @@ class MainActivity : AppCompatActivity() {
             try {
                 producer()
                     .collect {
-                        Log.d("jashwant", "Collector Thread - ${Thread.currentThread().name}")
+                        Log.d("jashwant", "1 Item - ${it}")
                     }
             }
             catch (e :Exception){
                 Log.d("jashwant", e.message.toString())
             }
         }
+        GlobalScope.launch(Dispatchers.Main) {
+            val result= producer()
+            delay(2500)
+            result.collect{
+                Log.d("jashwant", "2 Item - ${it}")
+            }
+        }
 
     }
     private fun producer(): Flow<Int> {
-        return flow <Int> {
-            val list = listOf(1, 2, 3, 4, 5)
+        val mutableSharedFlow = MutableSharedFlow<Int>()
+        GlobalScope.launch {
+            val list = listOf<Int>(1, 2, 3, 4, 5)
             list.forEach {
+                mutableSharedFlow.emit(it)
                 delay(timeMillis = 1000)
-                Log.d("jashwant", "Emitter Thread - ${Thread.currentThread().name}")
-                emit(it)
-                throw Exception("Error in Emitter")
             }
-        }.catch {
-            Log.d("jashwant", "Emitter catch - ${it.message}")
-            emit(-1)
         }
+        return mutableSharedFlow
     }
+
 }
